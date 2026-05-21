@@ -14,9 +14,12 @@ class Oglas(models.Model):
     datum_cas = models.DateTimeField(auto_now_add=True, verbose_name="Datum in čas objave oglasa")
     cena = models.DecimalField(decimal_places=2, verbose_name="Cena", help_text="Cena izdelka (v EUR)")
     ogledi = models.IntegerField(default=0, verbose_name="Število ogledov oglasa")
-    Tip = models.CharField(max_length=20, choices=TIPI_OGLASOV.items())
+    tip = models.CharField(max_length=20, choices=TIPI_OGLASOV.items())
     kategorije = models.ManyToManyField("Kategorija", verbose_name="Kategorije, v katere spada oglas")
     
+    def __str__(self):
+        return f"Oglas: {self.naslov}"      
+
     class Meta:
         verbose_name_plural = "Oglasi"
 
