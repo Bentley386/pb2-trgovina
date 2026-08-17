@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{% block naslov %}Trgovina{% endblock %}</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" />
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                    const $notification = $delete.parentNode;
+
+                    $delete.addEventListener('click', () => {
+                        $notification.parentNode.removeChild($notification);
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div id="navbar" class="navbar-menu">
+                <div class="navbar-start">
+                    <a href="{% url 'trgovina_app:index' %}" class="navbar-item">
+                        Domov
+                    </a>
+
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                            Oglasi
+                        </a>
+
+                        <div class="navbar-dropdown">
+                            <a href="{% url 'trgovina_app:oglas_najnovejsi' 10 %}" class="navbar-item">
+                                Najnovejši oglasi
+                            </a>
+                            <a href="{% url 'trgovina_app:oglas_poisci' %}" class="navbar-item">
+                                Poišči oglase
+                            </a>
+                            {% if perms.trgovina_app.add_oglas %}
+                            <a href="{% url 'trgovina_app:oglas_dodaj' %}" class="navbar-item">
+                                Dodaj oglas
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="buttons">
+                            {% if user.is_authenticated %}
+                            <a class="button is-static is-ghost">
+                                <strong>{{ user }}</strong>
+                            </a>
+                            <form action="{% url 'logout' %}" method="POST">
+                                {% csrf_token %}
+                                <button class="button is-primary">
+                                    Odjava
+                                </button>
+                            </form>
+                            {% else %}
+                            <a href="{% url 'registration' %}" class="button is-primary">
+                                <strong>Registracija</strong>
+                            </a>
+                            <a href="{% url 'login' %}" class="button is-light">
+                                Prijava
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {% block sporocilo %}
+        {% for message in messages %}
+        <div class="notification is-{{ message.tags }} is-light">
+            <button class="delete"></button>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endblock %}
+        <section class="section">
+            <div class="container">
+                {% block vsebina %}{% endblock %}
+            </div>
+        </section>
+    </body>
+</html>

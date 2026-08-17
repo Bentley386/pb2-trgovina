@@ -1,0 +1,12 @@
+{% extends "trgovina_app/osnova.html" %}
+
+{% block naslov %}{{ stevilo }} najnovejših oglasov{% endblock %}
+
+{% block vsebina %}
+<h1 class="title">{{ stevilo }} najnovejših oglasov</h1>
+<ol>
+    {% for oglas in seznam %}
+    <li><a href="{% url 'trgovina_app:oglas_podrobnosti' oglas.id %}">{{ oglas }}</a> &ndash; {{ oglas.cena }} €</li>
+    {% endfor %}
+</ol>
+{% endblock %}

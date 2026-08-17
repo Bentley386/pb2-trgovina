@@ -1,0 +1,69 @@
+{% extends "trgovina_app/osnova.html" %}
+{% load trgovina_app_extras %}
+{% block naslov %}{{ oglas.naslov }}{% endblock %}
+
+{% block vsebina %}
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">{{ oglas.naslov }}</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        {% if perms.trgovina_app.change_oglas %}
+        <div class="level-item">
+            <a href="{% url 'trgovina_app:oglas_uredi' oglas.pk %}" class="button is-primary">Uredi</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="block">
+    <span class="tag {% if oglas.tip == 'K' %}is-info{% else %}is-success{% endif %}">
+        {{ oglas.get_tip_display }}
+    </span>
+    {% if not oglas.aktiven %}
+    <span class="tag is-danger">Prodano</span>
+    {% endif %}
+</div>
+
+<div class="block">
+    <ul>
+        <li>Cena: {{ oglas.cena }} €</li>
+        <li>Lastnik: {{ oglas.lastnik }}</li>
+        <li>Objavljeno: {{ oglas.datum_cas }}</li>
+        <li>Ogledi: {{ oglas.ogledi }}</li>
+        {% if oglas.kategorije.all %}
+        <li>Kategorije:
+            {% for kategorija in oglas.kategorije.all %}
+                {{ kategorija.naziv }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+{% if oglas.opis %}
+<div class="block">
+    <h2 class="subtitle">Opis</h2>
+    <p>{{ oglas.opis }}</p>
+</div>
+{% endif %}
+
+{% if user.is_authenticated and user != oglas.lastnik %}
+<form action="{% url 'trgovina_app:oglas_kupi' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="oglas_id" value="{{ oglas.id }}">
+    {% if user|je_kupil:oglas %}
+    <button class="button is-danger">
+        Prekliči nakup
+    </button>
+    {% elif oglas.aktiven %}
+    <button class="button is-success">
+        Kupi
+    </button>
+    {% endif %}
+</form>
+{% endif %}
+
+{% endblock %}

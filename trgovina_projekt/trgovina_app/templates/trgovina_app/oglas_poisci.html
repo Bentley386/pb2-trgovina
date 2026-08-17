@@ -1,0 +1,44 @@
+{% extends "trgovina_app/osnova.html" %}
+
+{% block naslov %}Poišči oglase{% endblock %}
+
+{% block vsebina %}
+<form method="GET">
+    <div class="field">
+        <label class="label">Naslov oglasa vsebuje</label>
+        <div class="control">
+            <input class="input" type="text" name="zacetek" value="{{ poizvedba }}" placeholder="Npr. kolo">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Tip oglasa</label>
+        <div class="control">
+            <div class="select">
+                <select name="tip">
+                    <option value="" {% if not tip %}selected{% endif %}>Vsi</option>
+                    {% for kratica, naziv in tipi.items %}
+                    <option value="{{ kratica }}" {% if tip == kratica %}selected{% endif %}>{{ naziv }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <div class="control">
+            <button class="button is-success">Išči</button>
+        </div>
+    </div>
+</form>
+
+<hr>
+
+{% if rezultat %}
+    <ol>
+        {% for oglas in rezultat %}
+            <li><a href="{% url 'trgovina_app:oglas_podrobnosti' oglas.id %}">{{ oglas }}</a> &ndash; {{ oglas.cena }} €</li>
+        {% endfor %}
+    </ol>
+{% elif poizvedba or tip %}
+    <p>Ni oglasov, ki bi ustrezali iskanju.</p>
+{% endif %}
+{% endblock %}

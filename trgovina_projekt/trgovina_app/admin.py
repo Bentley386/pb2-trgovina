@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import Oglas, Kategorija, Transakcija
 
-# Register your models here.
+
+admin.site.register(Oglas)
+admin.site.register(Kategorija)
+admin.site.register(Transakcija)

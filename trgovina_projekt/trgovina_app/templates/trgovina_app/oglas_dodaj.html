@@ -1,0 +1,17 @@
+{% extends "trgovina_app/osnova.html" %}
+
+{% block naslov %}Dodaj oglas{% endblock %}
+
+{% block vsebina %}
+<form action="{% url 'trgovina_app:oglas_dodaj' %}" method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Dodaj oglas
+            </button>
+        </p>
+    </div>
+</form>
+{% endblock %}

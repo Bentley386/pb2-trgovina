@@ -1,0 +1,10 @@
+{% extends "trgovina_app/osnova.html" %}
+
+{% block vsebina %}
+<h1 class="title">Pozdravljeni v spletni trgovini!</h1>
+<p>
+    <a href="{% url 'trgovina_app:oglas_najnovejsi' 10 %}">Poglej najnovejše oglase</a>
+    ali
+    <a href="{% url 'trgovina_app:oglas_poisci' %}">poišči, kar te zanima</a>.
+</p>
+{% endblock %}
