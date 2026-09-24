@@ -6,11 +6,16 @@
 <form action="{% url 'trgovina_app:oglas_uredi' form.instance.pk %}" method="POST">
     {% csrf_token %}
     {{ form }}
-    <div class="field">
+    <div class="field is-grouped">
         <p class="control">
             <button class="button is-success">
                 Posodobi oglas
             </button>
+        </p>
+        <p class="control">
+            <a href="{% url 'trgovina_app:oglas_podrobnosti' form.instance.pk %}" class="button is-light">
+                Prekliči
+            </a>
         </p>
     </div>
 </form>

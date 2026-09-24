@@ -6,11 +6,16 @@
 <form action="{% url 'trgovina_app:oglas_dodaj' %}" method="POST">
     {% csrf_token %}
     {{ form }}
-    <div class="field">
+    <div class="field is-grouped">
         <p class="control">
             <button class="button is-success">
                 Dodaj oglas
             </button>
+        </p>
+        <p class="control">
+            <a href="{% url 'trgovina_app:index' %}" class="button is-light">
+                Prekliči
+            </a>
         </p>
     </div>
 </form>

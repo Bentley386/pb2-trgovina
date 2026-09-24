@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="level-right">
-        {% if perms.trgovina_app.change_oglas %}
+        {% if user == oglas.lastnik %}
         <div class="level-item">
             <a href="{% url 'trgovina_app:oglas_uredi' oglas.pk %}" class="button is-primary">Uredi</a>
         </div>

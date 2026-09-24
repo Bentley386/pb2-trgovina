@@ -79,7 +79,7 @@ def oglas_kupi(request):
     return HttpResponseNotAllowed(['POST'])
 
 
-@permission_required('trgovina_app.add_oglas')
+@login_required
 @transaction.atomic
 def oglas_dodaj(request):
     if request.method == "POST":
@@ -97,10 +97,13 @@ def oglas_dodaj(request):
     return render(request, 'trgovina_app/oglas_dodaj.html', kontekst)
 
 
-@permission_required('trgovina_app.change_oglas')
+@login_required
 @transaction.atomic
 def oglas_uredi(request, oglas_id):
     oglas = get_object_or_404(Oglas, id=oglas_id)
+    if oglas.lastnik != request.user:
+        messages.error(request, "Urejaš lahko samo svoje oglase.")
+        return redirect('trgovina_app:oglas_podrobnosti', oglas_id)
     if request.method == "POST":
         form = OglasForm(request.POST, instance=oglas)
         if form.is_valid():

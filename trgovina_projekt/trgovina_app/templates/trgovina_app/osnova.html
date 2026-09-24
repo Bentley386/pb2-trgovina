@@ -38,7 +38,7 @@
                             <a href="{% url 'trgovina_app:oglas_poisci' %}" class="navbar-item">
                                 Poišči oglase
                             </a>
-                            {% if perms.trgovina_app.add_oglas %}
+                            {% if user.is_authenticated %}
                             <a href="{% url 'trgovina_app:oglas_dodaj' %}" class="navbar-item">
                                 Dodaj oglas
                             </a>
