@@ -15,7 +15,7 @@ Django aplikacija za oglasnik (kupim/prodajam), narejena pri predmetu Podatkovne
 ## Podatkovni model
 
 - **Kategorija**: naziv (npr. "Šport", "Elektronika")
-- **Oglas**: naslov, opis, cena, tip (Kupim/Prodajam), lastnik, kategorije, ali je še aktiven
+- **Oglas**: naslov, opis, cena, tip (Kupim/Prodajam), lastnik, kategorije, ali je še aktiven, uporabniki, ki jim je oglas všeč
 - **Transakcija**: zabeleži nakup oglasa (kupec, cena, datum) – en oglas je lahko kupljen samo enkrat
 
 ## Zagon projekta
@@ -31,10 +31,24 @@ Stran je nato na voljo na `http://127.0.0.1:8000/`, skrbniški vmesnik pa na `ht
 
 **Pomembno:** preden lahko dodajaš oglase, moraš v adminu ustvariti vsaj eno Kategorijo (oglas mora imeti vsaj eno kategorijo).
 
+### Testni podatki
+
+Za hitro polnjenje baze z demo kategorijami, uporabniki in oglasi (za testiranje):
+
+```bash
+python manage.py napolni_bazo            # 40 oglasov
+python manage.py napolni_bazo --stevilo 100
+```
+
+Pozor: ta ukaz izbriše obstoječe oglase in kategorije preden ustvari nove.
+
 ## Funkcionalnosti
 
 - pregled najnovejših oglasov
 - iskanje oglasov (po naslovu in tipu Kupim/Prodajam)
-- dodajanje in urejanje oglasa (samo prijavljeni uporabniki z ustreznimi pravicami)
+- dodajanje oglasa in urejanje **lastnih** oglasov (vsak prijavljen uporabnik)
+- ročna označitev oglasa kot prodanega (pri urejanju) ali preko nakupa
 - nakup oglasa / preklic nakupa
+- označevanje oglasov kot priljubljenih ("Všeč mi je") in pregled seznama "Moji priljubljeni"
+- pregled lastnih objavljenih oglasov ("Moji oglasi")
 - registracija in prijava uporabnikov
