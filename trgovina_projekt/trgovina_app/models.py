@@ -29,6 +29,7 @@ class Oglas(models.Model):
     tip = models.CharField(max_length=20, choices=TIPI_OGLASOV.items(), verbose_name="Tip oglasa")
     aktiven = models.BooleanField(default=True, verbose_name="Ali je oglas še aktiven (ni prodan/kupljen)")
     kategorije = models.ManyToManyField(Kategorija, verbose_name="Kategorije, v katere spada oglas")
+    priljubljen_pri = models.ManyToManyField(User, related_name="priljubljeni_oglasi", blank=True, verbose_name="Uporabniki, ki jim je oglas všeč")
 
     def __str__(self):
         return f"{self.get_tip_display()}: {self.naslov}"

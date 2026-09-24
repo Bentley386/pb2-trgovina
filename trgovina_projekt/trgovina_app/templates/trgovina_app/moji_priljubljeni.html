@@ -1,0 +1,24 @@
+{% extends "trgovina_app/osnova.html" %}
+
+{% block naslov %}Moji priljubljeni{% endblock %}
+
+{% block vsebina %}
+<h1 class="title">Moji priljubljeni oglasi</h1>
+
+{% if seznam %}
+<ul>
+    {% for oglas in seznam %}
+    <li>
+        <a href="{% url 'trgovina_app:oglas_podrobnosti' oglas.id %}">{{ oglas }}</a>
+        &ndash; {{ oglas.cena }} €
+        {% if not oglas.aktiven %}
+        <span class="tag is-danger">Prodano</span>
+        {% endif %}
+        {% include "trgovina_app/priljubljen_gumb.html" %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Še nimaš priljubljenih oglasov.</p>
+{% endif %}
+{% endblock %}

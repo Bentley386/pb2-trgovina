@@ -32,7 +32,6 @@
         <li>Cena: {{ oglas.cena }} €</li>
         <li>Lastnik: {{ oglas.lastnik }}</li>
         <li>Objavljeno: {{ oglas.datum_cas }}</li>
-        <li>Ogledi: {{ oglas.ogledi }}</li>
         {% if oglas.kategorije.all %}
         <li>Kategorije:
             {% for kategorija in oglas.kategorije.all %}
@@ -51,7 +50,7 @@
 {% endif %}
 
 {% if user.is_authenticated and user != oglas.lastnik %}
-<form action="{% url 'trgovina_app:oglas_kupi' %}" method="POST">
+<form action="{% url 'trgovina_app:oglas_kupi' %}" method="POST" style="display:inline">
     {% csrf_token %}
     <input type="hidden" name="oglas_id" value="{{ oglas.id }}">
     {% if user|je_kupil:oglas %}
@@ -64,6 +63,7 @@
     </button>
     {% endif %}
 </form>
+{% include "trgovina_app/priljubljen_gumb.html" %}
 {% endif %}
 
 {% endblock %}

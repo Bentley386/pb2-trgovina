@@ -1,0 +1,13 @@
+{% load trgovina_app_extras %}
+{% if user.is_authenticated and user != oglas.lastnik %}
+<form action="{% url 'trgovina_app:oglas_priljubljen' %}" method="POST" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="oglas_id" value="{{ oglas.id }}">
+    <input type="hidden" name="next" value="{{ request.path }}">
+    {% if user|je_priljubljen:oglas %}
+    <button class="button is-small is-light">Všeč mi je</button>
+    {% else %}
+    <button class="button is-small is-success">Všeč mi je</button>
+    {% endif %}
+</form>
+{% endif %}

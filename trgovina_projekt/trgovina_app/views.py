@@ -7,7 +7,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
 from .models import Oglas, Kategorija, Transakcija
-from .forms import OglasForm
+from .forms import OglasForm, OglasUrediForm
 
 
 def index(request):
@@ -20,6 +20,13 @@ def oglas_podrobnosti(request, oglas_id):
     oglas.refresh_from_db()
     kontekst = {'oglas': oglas}
     return render(request, 'trgovina_app/oglas_podrobnosti.html', kontekst)
+
+
+@login_required
+def moji_oglasi(request):
+    oglasi = Oglas.objects.filter(lastnik=request.user).order_by('-datum_cas')
+    kontekst = {'seznam': oglasi}
+    return render(request, 'trgovina_app/moji_oglasi.html', kontekst)
 
 
 def oglas_najnovejsi(request, stevilo):
@@ -81,6 +88,37 @@ def oglas_kupi(request):
 
 @login_required
 @transaction.atomic
+def oglas_priljubljen(request):
+    if request.method == 'POST':
+        oglas_id = request.POST.get('oglas_id', -1)
+        oglas = get_object_or_404(Oglas, id=oglas_id)
+        next_url = request.POST.get('next', '')
+        user = request.user
+
+        if oglas.lastnik == user:
+            messages.error(request, "Svojega oglasa ne moreš dati med priljubljene.")
+        elif oglas.priljubljen_pri.filter(id=user.id).exists():
+            oglas.priljubljen_pri.remove(user)
+            messages.success(request, "Oglas odstranjen iz priljubljenih.")
+        else:
+            oglas.priljubljen_pri.add(user)
+            messages.success(request, "Oglas dodan med priljubljene.")
+
+        if next_url and next_url.startswith('/'):
+            return redirect(next_url)
+        return redirect('trgovina_app:oglas_podrobnosti', oglas_id)
+    return HttpResponseNotAllowed(['POST'])
+
+
+@login_required
+def moji_priljubljeni(request):
+    oglasi = request.user.priljubljeni_oglasi.all().order_by('-datum_cas')
+    kontekst = {'seznam': oglasi}
+    return render(request, 'trgovina_app/moji_priljubljeni.html', kontekst)
+
+
+@login_required
+@transaction.atomic
 def oglas_dodaj(request):
     if request.method == "POST":
         form = OglasForm(request.POST)
@@ -105,13 +143,13 @@ def oglas_uredi(request, oglas_id):
         messages.error(request, "Urejaš lahko samo svoje oglase.")
         return redirect('trgovina_app:oglas_podrobnosti', oglas_id)
     if request.method == "POST":
-        form = OglasForm(request.POST, instance=oglas)
+        form = OglasUrediForm(request.POST, instance=oglas)
         if form.is_valid():
             form.save()
             messages.success(request, "Oglas je bil uspešno posodobljen!")
             return redirect('trgovina_app:oglas_podrobnosti', oglas_id=form.instance.pk)
     else:
-        form = OglasForm(instance=oglas)
+        form = OglasUrediForm(instance=oglas)
     kontekst = {'form': form}
     return render(request, 'trgovina_app/oglas_uredi.html', kontekst)
 

@@ -17,9 +17,19 @@ class BulmaFormMixin:
 
 
 class OglasForm(BulmaFormMixin, ModelForm):
+    """Obrazec za dodajanje novega oglasa - oglas je ob objavi vedno aktiven."""
     class Meta:
         model = Oglas
         exclude = ['lastnik', 'ogledi', 'aktiven']
         widgets = {
             "opis": Textarea()
+        }
+
+
+class OglasUrediForm(OglasForm):
+    """Obrazec za urejanje - lastnik lahko tu oglas tudi ročno označi kot prodan."""
+    class Meta(OglasForm.Meta):
+        exclude = ['lastnik', 'ogledi']
+        labels = {
+            "aktiven": "Oglas je še aktiven (odkljukaj, če je bil oglas prodan/kupljen)",
         }

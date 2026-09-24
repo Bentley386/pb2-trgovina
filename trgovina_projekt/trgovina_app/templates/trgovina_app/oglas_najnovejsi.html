@@ -6,7 +6,10 @@
 <h1 class="title">{{ stevilo }} najnovejših oglasov</h1>
 <ol>
     {% for oglas in seznam %}
-    <li><a href="{% url 'trgovina_app:oglas_podrobnosti' oglas.id %}">{{ oglas }}</a> &ndash; {{ oglas.cena }} €</li>
+    <li>
+        <a href="{% url 'trgovina_app:oglas_podrobnosti' oglas.id %}">{{ oglas }}</a> &ndash; {{ oglas.cena }} €
+        {% include "trgovina_app/priljubljen_gumb.html" %}
+    </li>
     {% endfor %}
 </ol>
 {% endblock %}
