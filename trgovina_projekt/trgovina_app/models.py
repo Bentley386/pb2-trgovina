@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -24,7 +25,7 @@ class Oglas(models.Model):
     opis = models.CharField(max_length=5000, blank=True, default="", verbose_name="Opis oglasa", help_text="Do 5000 znakov")
     lastnik = models.ForeignKey(User, on_delete=models.CASCADE, related_name="oglasi", verbose_name="Lastnik oglasa")
     datum_cas = models.DateTimeField(auto_now_add=True, verbose_name="Datum in čas objave oglasa")
-    cena = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Cena", help_text="Cena izdelka (v EUR)")
+    cena = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="Cena", help_text="Cena izdelka v EUR (ne more biti negativna)")
     ogledi = models.IntegerField(default=0, verbose_name="Število ogledov oglasa")
     tip = models.CharField(max_length=20, choices=TIPI_OGLASOV.items(), verbose_name="Tip oglasa")
     aktiven = models.BooleanField(default=True, verbose_name="Ali je oglas še aktiven (ni prodan/kupljen)")
@@ -36,13 +37,19 @@ class Oglas(models.Model):
 
     class Meta:
         ordering = ["-datum_cas"]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(cena__gte=0),
+                name="cena_oglasa_ni_negativna"
+            )
+        ]
         verbose_name_plural = "Oglasi"
 
 
 class Transakcija(models.Model):
     oglas = models.ForeignKey(Oglas, on_delete=models.CASCADE, related_name="transakcije", verbose_name="Oglas")
     kupec = models.ForeignKey(User, on_delete=models.CASCADE, related_name="nakupi", verbose_name="Kupec")
-    cena = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Dogovorjena cena")
+    cena = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="Dogovorjena cena")
     datum_cas = models.DateTimeField(auto_now_add=True, verbose_name="Datum in čas transakcije")
 
     def __str__(self):
@@ -54,6 +61,10 @@ class Transakcija(models.Model):
             models.UniqueConstraint(
                 fields=["oglas"],
                 name="enolicnost_transakcije_oglasa"
+            ),
+            models.CheckConstraint(
+                check=models.Q(cena__gte=0),
+                name="cena_transakcije_ni_negativna"
             )
         ]
         verbose_name_plural = "Transakcije"
