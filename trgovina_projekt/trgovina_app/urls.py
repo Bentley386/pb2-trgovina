@@ -14,4 +14,6 @@ urlpatterns = [
     path('oglas_dodaj', views.oglas_dodaj, name='oglas_dodaj'),
     path('oglas_uredi/<int:oglas_id>', views.oglas_uredi, name='oglas_uredi'),
     path('kupi', views.oglas_kupi, name='oglas_kupi'),
+    path('moje_transakcije', views.moje_transakcije, name='moje_transakcije'),
+    path('transakcija_preklici', views.transakcija_preklici, name='transakcija_preklici'),
 ]

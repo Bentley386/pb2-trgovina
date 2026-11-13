@@ -78,7 +78,7 @@ class Command(BaseCommand):
         prodani = random.sample(oglasi, k=max(1, stevilo // 8))
         for oglas in prodani:
             kupci = [u for u in uporabniki if u != oglas.lastnik]
-            Transakcija.objects.create(oglas=oglas, kupec=random.choice(kupci), cena=oglas.cena)
+            Transakcija.objects.create(oglas=oglas, nelastnik=random.choice(kupci), cena=oglas.cena)
             oglas.aktiven = False
             oglas.save()
 

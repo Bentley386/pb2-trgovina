@@ -1,0 +1,32 @@
+{% extends "trgovina_app/osnova.html" %}
+
+{% block naslov %}Moje transakcije{% endblock %}
+
+{% block vsebina %}
+<h1 class="title">Moje transakcije</h1>
+
+{% if seznam %}
+<ul>
+    {% for transakcija in seznam %}
+    <li>
+        <a href="{% url 'trgovina_app:oglas_podrobnosti' transakcija.oglas.id %}">{{ transakcija.oglas }}</a>
+        &ndash; {{ transakcija.cena }} €
+        &ndash; {{ transakcija.oglas.lastnik }} in {{ transakcija.nelastnik }}
+        &ndash; {{ transakcija.datum_cas }}
+        {% if transakcija.status == 'P' %}
+        <span class="tag is-danger">Preklicana</span>
+        {% else %}
+        <span class="tag is-success">Aktivna</span>
+        <form action="{% url 'trgovina_app:transakcija_preklici' %}" method="POST" style="display:inline">
+            {% csrf_token %}
+            <input type="hidden" name="transakcija_id" value="{{ transakcija.id }}">
+            <button class="button is-small is-danger">Prekliči</button>
+        </form>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Nimaš še nobene transakcije.</p>
+{% endif %}
+{% endblock %}

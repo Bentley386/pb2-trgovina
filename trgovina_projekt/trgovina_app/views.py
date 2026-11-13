@@ -67,22 +67,48 @@ def oglas_kupi(request):
             messages.error(request, "Svojega oglasa ne moreš kupiti.")
             return redirect('trgovina_app:oglas_podrobnosti', oglas_id)
 
-        obstojeca = Transakcija.objects.filter(oglas=oglas).first()
-        if obstojeca:
-            if obstojeca.kupec == user:
-                obstojeca.delete()
-                oglas.aktiven = True
-                oglas.save()
-                messages.success(request, "Nakup je bil preklican.")
-            else:
-                messages.error(request, "Oglas je žal že prodan.")
+        if not oglas.aktiven:
+            messages.error(request, "Oglas ni več aktiven.")
         else:
-            Transakcija.objects.create(oglas=oglas, kupec=user, cena=oglas.cena)
+            Transakcija.objects.create(oglas=oglas, nelastnik=user, cena=oglas.cena)
             oglas.aktiven = False
             oglas.save()
-            messages.success(request, "Nakup je bil uspešno zabeležen!")
+            messages.success(request, "Transakcija je bila uspešno zabeležena!")
+            return redirect('trgovina_app:moje_transakcije')
 
         return redirect('trgovina_app:oglas_podrobnosti', oglas_id)
+    return HttpResponseNotAllowed(['POST'])
+
+
+@login_required
+def moje_transakcije(request):
+    transakcije = Transakcija.objects.filter(
+        Q(nelastnik=request.user) | Q(oglas__lastnik=request.user)
+    ).order_by('-datum_cas')
+    kontekst = {'seznam': transakcije}
+    return render(request, 'trgovina_app/moje_transakcije.html', kontekst)
+
+
+@login_required
+@transaction.atomic
+def transakcija_preklici(request):
+    if request.method == 'POST':
+        transakcija_id = request.POST.get('transakcija_id', -1)
+        transakcija = get_object_or_404(Transakcija, id=transakcija_id)
+        user = request.user
+
+        if user != transakcija.nelastnik and user != transakcija.oglas.lastnik:
+            messages.error(request, "Prekličeš lahko samo svoje transakcije.")
+        elif transakcija.status == "P":
+            messages.error(request, "Transakcija je že preklicana.")
+        else:
+            transakcija.status = "P"
+            transakcija.save()
+            transakcija.oglas.aktiven = True
+            transakcija.oglas.save()
+            messages.success(request, "Transakcija je bila preklicana, oglas je spet aktiven.")
+
+        return redirect('trgovina_app:moje_transakcije')
     return HttpResponseNotAllowed(['POST'])
 
 

@@ -50,19 +50,19 @@
 {% endif %}
 
 {% if user.is_authenticated and user != oglas.lastnik %}
+{% if oglas.aktiven %}
 <form action="{% url 'trgovina_app:oglas_kupi' %}" method="POST" style="display:inline">
     {% csrf_token %}
     <input type="hidden" name="oglas_id" value="{{ oglas.id }}">
-    {% if user|je_kupil:oglas %}
-    <button class="button is-danger">
-        Prekliči nakup
-    </button>
-    {% elif oglas.aktiven %}
     <button class="button is-success">
+        {% if oglas.tip == 'K' %}
+        Prodaj
+        {% else %}
         Kupi
+        {% endif %}
     </button>
-    {% endif %}
 </form>
+{% endif %}
 {% include "trgovina_app/priljubljen_gumb.html" %}
 {% endif %}
 

@@ -25,7 +25,7 @@ class Oglas(models.Model):
     opis = models.CharField(max_length=5000, blank=True, default="", verbose_name="Opis oglasa", help_text="Do 5000 znakov")
     lastnik = models.ForeignKey(User, on_delete=models.CASCADE, related_name="oglasi", verbose_name="Lastnik oglasa")
     datum_cas = models.DateTimeField(auto_now_add=True, verbose_name="Datum in čas objave oglasa")
-    cena = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="Cena", help_text="Cena izdelka v EUR (ne more biti negativna)")
+    cena = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0, message="Cena ne sme biti negativna!")], verbose_name="Cena", help_text="Cena izdelka v EUR (ne more biti negativna)")
     ogledi = models.IntegerField(default=0, verbose_name="Število ogledov oglasa")
     tip = models.CharField(max_length=20, choices=TIPI_OGLASOV.items(), verbose_name="Tip oglasa")
     aktiven = models.BooleanField(default=True, verbose_name="Ali je oglas še aktiven (ni prodan/kupljen)")
@@ -47,20 +47,28 @@ class Oglas(models.Model):
 
 
 class Transakcija(models.Model):
+
+    STATUS = {
+        "A" : "Aktivna",
+        "P" : "Preklicana"
+    }
+
     oglas = models.ForeignKey(Oglas, on_delete=models.CASCADE, related_name="transakcije", verbose_name="Oglas")
-    kupec = models.ForeignKey(User, on_delete=models.CASCADE, related_name="nakupi", verbose_name="Kupec")
+    nelastnik = models.ForeignKey(User, on_delete=models.CASCADE, related_name="nakupi", verbose_name="Nelastnik")
     cena = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="Dogovorjena cena")
     datum_cas = models.DateTimeField(auto_now_add=True, verbose_name="Datum in čas transakcije")
+    status = models.CharField(max_length=1, choices=STATUS.items(), default="A", verbose_name="Status transakcije")
 
     def __str__(self):
-        return f"Transakcija: {self.oglas.naslov} ({self.kupec})"
+        return f"Transakcija za \"{self.oglas.naslov}\" med {self.oglas.lastnik} in {self.nelastnik} "
 
     class Meta:
         ordering = ["-datum_cas"]
         constraints = [
             models.UniqueConstraint(
                 fields=["oglas"],
-                name="enolicnost_transakcije_oglasa"
+                condition=models.Q(status="A"),
+                name="enolicnost_aktivne_transakcije_oglasa"
             ),
             models.CheckConstraint(
                 check=models.Q(cena__gte=0),
